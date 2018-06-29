@@ -5,6 +5,7 @@ from pathlib import Path
 import datetime
 import sys
 import email
+import re
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -36,6 +37,7 @@ def save_attachment(msg, list_raz, label_when_save, get_imap, msg_id, download_f
 
     att_path = "No attachment found."
     for part in msg.walk():
+        count_file = 0
         if part.get('Content-Disposition') is None:
             continue
         if part.get_filename():
@@ -79,6 +81,8 @@ def save_attachment(msg, list_raz, label_when_save, get_imap, msg_id, download_f
             filename = filename.decode(decode_header(part.get_filename())[0][1])
 
         if (Path(filename.encode("utf-8")).suffix.lower() in list_raz) == True:
+            filename = file_exists(filename, att_path, count_file)
+
             write_to_file_txt(file_logs, dir_save_logs, 'a', write_text + "\tFiels_is:\t" + filename)
             fp = open(att_path + filename, u'wb')
             fp.write(part.get_payload(decode=True))
@@ -86,6 +90,7 @@ def save_attachment(msg, list_raz, label_when_save, get_imap, msg_id, download_f
             get_imap.store(msg_id, '+FLAGS.SILENT', '\SEEN')
             print att_path + filename
         else:
+            filename = file_exists(filename, att_path + u"brak/", count_file)
             write_to_file_txt(file_logs_brak, dir_save_logs, 'a',
                               write_text + "\tFiels is: BRAK\t" + filename)
             try:
@@ -96,6 +101,7 @@ def save_attachment(msg, list_raz, label_when_save, get_imap, msg_id, download_f
             fp.write(part.get_payload(decode=True))
             fp.close()
             print att_path + filename
+
     return att_path + filename
 
 
@@ -131,3 +137,15 @@ def type_email(message_date):
     return who_is_content_type[0]
 
 
+def file_exists(file_name, folder, count_file):
+    if os.path.exists(folder + file_name):
+        if count_file == 0:
+            file_name = file_name.replace(Path(file_name.encode('utf-8')).suffix,
+                                          '(' + str(count_file + 1) + ')' + Path(file_name.encode('utf-8')).suffix)
+
+        file_name = file_name.replace('(' + str(count_file - 1) + ')', '(' + str(count_file) + ')')
+        count_file += 1
+        # file_name = file_name.replace("(\w)", "(" + str(count_file) + ")" + Path(file_name.encode("utf-8")).suffix)
+        file_name = file_exists(file_name, folder, count_file)
+
+    return file_name
