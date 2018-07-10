@@ -72,7 +72,7 @@ def save_attachment(msg, list_raz, label_when_save, get_imap, msg_id, download_f
             filename = filename.decode(get_title_list[0][1])
         except:
             pass
-        write_text = u"Date_download:\t{}\tFrom:\t{}\tDate_email:\t{}\tTitel:\t{}\t".format(datetime.datetime.now(), who_from, msg_date_give,
+        write_text = u"Date_download:\t{}\tLabel:\t{}\tFrom:\t{}\tDate_email:\t{}\tTitel:\t{}\t".format(datetime.datetime.now(), label_when_save,who_from, msg_date_give,
                                                                                             get_title)
         # print filename.decode(get_title_list[0][1])
         try:
