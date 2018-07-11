@@ -24,3 +24,4 @@ for label in label_save:
     scripts.get_list_label(imap, label, list_rashireniy)
 
 imap.logout()
+unzip_file.main()
